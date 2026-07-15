@@ -1,0 +1,4 @@
+import { NextRequest, NextResponse } from "next/server";
+import { requireRole } from "@/lib/auth";
+import { sql } from "@/lib/db";
+export async function POST(request:NextRequest){try{const user=await requireRole(["Administrator"]);const body=await request.json();for(const [key,value] of Object.entries(body)){await sql`INSERT INTO system_settings(setting_key,setting_value,updated_by,updated_at) VALUES(${key},${String(value??"")},${user.userId}::uuid,CURRENT_TIMESTAMP) ON CONFLICT(setting_key) DO UPDATE SET setting_value=EXCLUDED.setting_value,updated_by=EXCLUDED.updated_by,updated_at=CURRENT_TIMESTAMP`;}return NextResponse.json({success:true,message:"Settings saved successfully."});}catch(error){console.error(error);return NextResponse.json({success:false,message:"Settings could not be saved."},{status:500});}}
