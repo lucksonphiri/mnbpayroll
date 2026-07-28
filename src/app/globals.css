@@ -48,3 +48,64 @@ body {
     display: none !important;
   }
 }
+
+/* Mobile responsiveness only. Desktop styling is intentionally unchanged. */
+@media (max-width: 1023px) {
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  main {
+    min-width: 0;
+  }
+
+  table {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+
+  thead,
+  tbody,
+  tfoot {
+    width: max-content;
+    min-width: 100%;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    max-width: 100%;
+  }
+
+  img,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
+  }
+
+  .mobile-dashboard-menu summary::-webkit-details-marker {
+    display: none;
+  }
+}
+
+@media (max-width: 639px) {
+  h1 {
+    overflow-wrap: anywhere;
+  }
+
+  .grid {
+    min-width: 0;
+  }
+
+  form {
+    min-width: 0;
+  }
+}

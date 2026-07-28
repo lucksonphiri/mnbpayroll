@@ -75,21 +75,21 @@ export default async function DashboardLayout({
   return (
     <div className="min-h-screen bg-slate-100">
       <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-[1600px] items-center justify-between px-5 py-4">
-          <div>
+        <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-3 px-4 py-4 sm:px-5">
+          <div className="min-w-0">
             <Link
               href="/dashboard"
-              className="text-xl font-black text-blue-800"
+              className="block truncate text-lg font-black text-blue-800 sm:text-xl"
             >
               Payroll Management System
             </Link>
 
-            <p className="text-xs text-slate-500">
+            <p className="truncate text-xs text-slate-500">
               Employee and payroll administration
             </p>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-4">
             <div className="hidden text-right sm:block">
               <p className="text-sm font-bold text-slate-800">
                 {user.fullName}
@@ -101,6 +101,28 @@ export default async function DashboardLayout({
             <LogoutButton />
           </div>
         </div>
+
+        <details className="mobile-dashboard-menu border-t border-slate-200 bg-white lg:hidden">
+          <summary className="cursor-pointer list-none px-4 py-3 font-bold text-blue-800">
+            <span className="flex items-center justify-between">
+              <span>Menu</span>
+              <span aria-hidden="true">☰</span>
+            </span>
+          </summary>
+
+          <nav className="max-h-[70vh] overflow-y-auto border-t border-slate-100 px-4 py-4">
+            <Link
+              href="/dashboard"
+              className="block rounded-xl bg-blue-50 px-4 py-3 font-bold text-blue-800"
+            >
+              Dashboard
+            </Link>
+
+            <NavSection title="Human Resources" items={humanResourcesItems} />
+            <NavSection title="Payroll" items={payrollItems} />
+            <NavSection title="Administration" items={administrationItems} />
+          </nav>
+        </details>
       </header>
 
       <div className="mx-auto flex max-w-[1600px]">
