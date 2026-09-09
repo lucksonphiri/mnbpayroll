@@ -41,11 +41,7 @@ type EmployeeDeduction = {
 export const dynamic = "force-dynamic";
 
 export default async function DeductionsPage() {
-  const user = await requireRole([
-    "Administrator",
-    "Human Resources",
-    "Accounts Officer",
-  ]);
+  const user = await requireRole(["Administrator", "Salaries Officer"]);
 
   let employees: Employee[] = [];
   let deductionTypes: DeductionType[] = [];
@@ -128,8 +124,7 @@ export default async function DeductionsPage() {
 
   const canManage = [
     "Administrator",
-    "Human Resources",
-    "Accounts Officer",
+    "Salaries Officer",
   ].includes(user.role);
 
   return (

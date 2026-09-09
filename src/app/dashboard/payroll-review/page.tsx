@@ -74,11 +74,7 @@ function displayDate(value: string | null): string {
 export const dynamic = "force-dynamic";
 
 export default async function PayrollReviewPage() {
-  await requireRole([
-    "Administrator",
-    "Human Resources",
-    "Accounts Officer",
-  ]);
+  await requireRole(["Administrator", "Salaries Officer"]);
 
   let payrollRuns: PayrollRun[] = [];
   let databaseAvailable = true;

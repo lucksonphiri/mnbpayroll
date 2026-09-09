@@ -16,6 +16,7 @@ type Department = {
 type Props = {
   initialDepartments: Department[];
   canDelete: boolean;
+  canEdit: boolean;
 };
 
 const emptyForm = {
@@ -29,6 +30,7 @@ const emptyForm = {
 export default function DepartmentManager({
   initialDepartments,
   canDelete,
+  canEdit,
 }: Props) {
   const router = useRouter();
 
@@ -211,7 +213,7 @@ export default function DepartmentManager({
                 updateField("name", event.target.value)
               }
               required
-              placeholder="Human Resources"
+              placeholder="HR Officer"
               className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-100"
             />
           </div>
@@ -374,15 +376,9 @@ export default function DepartmentManager({
 
                     <td className="px-6 py-4">
                       <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            startEdit(department)
-                          }
-                          className="rounded-lg border border-blue-200 px-3 py-2 text-sm font-bold text-blue-700 hover:bg-blue-50"
-                        >
-                          Edit
-                        </button>
+                        {canEdit && (
+                          <button type="button" onClick={() => startEdit(department)} className="rounded-lg border border-blue-200 px-3 py-2 text-sm font-bold text-blue-700 hover:bg-blue-50">Edit</button>
+                        )}
 
                         {canDelete && (
                           <button

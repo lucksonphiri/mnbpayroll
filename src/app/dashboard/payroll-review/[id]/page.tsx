@@ -36,11 +36,7 @@ export const dynamic = "force-dynamic";
 export default async function PayrollReviewDetailsPage({
   params,
 }: PageProps) {
-  const user = await requireRole([
-    "Administrator",
-    "Human Resources",
-    "Accounts Officer",
-  ]);
+  const user = await requireRole(["Administrator", "Salaries Officer"]);
 
   const { id } = await params;
 
@@ -112,7 +108,7 @@ export default async function PayrollReviewDetailsPage({
   `) as EmployeePayroll[];
 
   const canApprove =
-    user.role === "Administrator" &&
+    ["Administrator", "Salaries Officer"].includes(user.role) &&
     payrollRun.status === "completed";
 
   const warnings = payrollRun.notes

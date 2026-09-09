@@ -14,7 +14,7 @@ export async function POST(
   context: RouteContext,
 ) {
   try {
-    const user = await requireRole(["Administrator"]);
+    const user = await requireRole(["Administrator", "Salaries Officer"]);
     const { id } = await context.params;
 
     if (!id) {

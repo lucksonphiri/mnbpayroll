@@ -18,11 +18,7 @@ function cleanText(value: unknown): string {
 
 export async function GET() {
   try {
-    await requireRole([
-      "Administrator",
-      "Human Resources",
-      "Accounts Officer",
-    ]);
+    await requireRole(["Administrator", "HR Officer"]);
 
     const departments = (await sql`
       SELECT
@@ -64,7 +60,7 @@ export async function POST(request: NextRequest) {
   try {
     const user = await requireRole([
       "Administrator",
-      "Human Resources",
+      "HR Officer",
     ]);
 
     const body = await request.json();

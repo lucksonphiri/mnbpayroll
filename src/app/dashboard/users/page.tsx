@@ -1,0 +1,5 @@
+import UserManager from "./UserManager";
+import {requireRole} from "@/lib/auth";
+import {sql} from "@/lib/db";
+export const dynamic="force-dynamic";
+export default async function UsersPage(){await requireRole(["Administrator"]);const users=await sql`SELECT u.id,u.full_name,u.email,u.status,u.must_change_password,u.last_login_at,u.created_at,r.name role_name FROM users u JOIN roles r ON r.id=u.role_id WHERE u.email NOT LIKE 'deleted+%' ORDER BY u.full_name`;const roles=await sql`SELECT id,name FROM roles WHERE name IN ('Administrator','HR Officer','Salaries Officer') ORDER BY name`;return <div className="space-y-8"><div><p className="text-sm font-black uppercase tracking-[.18em] text-blue-600">Administration</p><h1 className="mt-2 text-3xl font-black text-slate-950">User Management</h1><p className="mt-2 max-w-3xl text-slate-500">Create users, assign roles, suspend access, reset passwords and remove accounts.</p></div><UserManager initialUsers={users as any[]} roles={roles as any[]}/></div>}

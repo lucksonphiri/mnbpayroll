@@ -1,0 +1,5 @@
+import {NextRequest,NextResponse} from "next/server";
+import {requireRole} from "@/lib/auth";
+import {sql} from "@/lib/db";
+type Ctx={params:Promise<{id:string;documentId:string}>};
+export async function GET(_r:NextRequest,{params}:Ctx){try{await requireRole(["Administrator","HR Officer"]);const {id,documentId}=await params;const rows=await sql`SELECT file_name,mime_type,encode(file_data,'base64') AS file_base64 FROM employee_documents WHERE id=${documentId}::uuid AND employee_id=${id}::uuid LIMIT 1`;if(!rows.length)return NextResponse.json({success:false,message:"Document not found."},{status:404});const row:any=rows[0];const bytes=Buffer.from(String(row.file_base64||''),'base64');return new NextResponse(bytes,{headers:{'Content-Type':String(row.mime_type||'application/octet-stream'),'Content-Disposition':`inline; filename="${String(row.file_name).replace(/"/g,'')}"`,'Cache-Control':'private, max-age=60'}});}catch(error){console.error(error);return NextResponse.json({success:false,message:"Unable to open document."},{status:500});}}

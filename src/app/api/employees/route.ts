@@ -28,11 +28,7 @@ type EmployeeRow = {
 
 export async function GET(request: NextRequest) {
   try {
-    await requireRole([
-      "Administrator",
-      "Human Resources",
-      "Accounts Officer",
-    ]);
+    await requireRole(["Administrator", "HR Officer"]);
 
     const search =
       request.nextUrl.searchParams.get("search")?.trim() ??
@@ -109,7 +105,7 @@ export async function POST(request: NextRequest) {
   try {
     const user = await requireRole([
       "Administrator",
-      "Human Resources",
+      "HR Officer",
     ]);
 
     const body = await request.json();

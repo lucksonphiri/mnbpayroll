@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { requireRole } from "@/lib/auth";
+import { hasEditAccess } from "@/lib/permissions";
 import { sql } from "@/lib/db";
 import {
   cleanDate,
@@ -22,11 +23,7 @@ export async function GET(
   context: RouteContext,
 ) {
   try {
-    await requireRole([
-      "Administrator",
-      "Human Resources",
-      "Accounts Officer",
-    ]);
+    await requireRole(["Administrator", "HR Officer"]);
 
     const { id } = await context.params;
 
@@ -87,10 +84,13 @@ export async function PATCH(
   try {
     const user = await requireRole([
       "Administrator",
-      "Human Resources",
+      "HR Officer",
     ]);
 
     const { id } = await context.params;
+    if (!(await hasEditAccess(user, "Employees", id))) {
+      return NextResponse.json({success:false,message:"Editing is locked. Request temporary edit access from the Administrator."},{status:403});
+    }
     const body = await request.json();
 
     const title = cleanOptionalText(body.title);

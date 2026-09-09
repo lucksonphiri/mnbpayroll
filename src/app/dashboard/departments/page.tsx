@@ -2,6 +2,7 @@ import DepartmentManager from "./DepartmentManager";
 
 import { sql } from "@/lib/db";
 import { requireRole } from "@/lib/auth";
+import { hasEditAccess } from "@/lib/permissions";
 
 type Department = {
   id: string;
@@ -16,11 +17,7 @@ type Department = {
 export const dynamic = "force-dynamic";
 
 export default async function DepartmentsPage() {
-  const user = await requireRole([
-    "Administrator",
-    "Human Resources",
-    "Accounts Officer",
-  ]);
+  const user = await requireRole(["Administrator", "HR Officer"]);
 
   const departments = (await sql`
     SELECT
@@ -52,53 +49,11 @@ export default async function DepartmentsPage() {
         </p>
       </div>
 
-      {user.role === "Accounts Officer" ? (
-        <section className="overflow-hidden rounded-2xl bg-white shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[700px] text-left">
-              <thead className="bg-slate-50">
-                <tr>
-                  <th className="px-6 py-4">Department</th>
-                  <th className="px-6 py-4">Code</th>
-                  <th className="px-6 py-4">Positions</th>
-                  <th className="px-6 py-4">Employees</th>
-                  <th className="px-6 py-4">Status</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {departments.map((department) => (
-                  <tr
-                    key={department.id}
-                    className="border-t border-slate-100"
-                  >
-                    <td className="px-6 py-4 font-bold">
-                      {department.name}
-                    </td>
-                    <td className="px-6 py-4">
-                      {department.code || "—"}
-                    </td>
-                    <td className="px-6 py-4">
-                      {department.position_count}
-                    </td>
-                    <td className="px-6 py-4">
-                      {department.employee_count}
-                    </td>
-                    <td className="px-6 py-4 capitalize">
-                      {department.status}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      ) : (
-        <DepartmentManager
-          initialDepartments={departments}
-          canDelete={user.role === "Administrator"}
-        />
+      {user.role === "HR Officer" && !(await hasEditAccess(user, "Departments")) && (
+        <div className="mb-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">Existing departments are locked after capture. <a href="/dashboard/edit-access" className="font-black underline">Request edit access</a> to correct a mistake.</div>
       )}
+      <DepartmentManager initialDepartments={departments} canDelete={user.role === "Administrator"} canEdit={await hasEditAccess(user, "Departments")} />
+
     </div>
   );
 }

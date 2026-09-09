@@ -27,7 +27,7 @@ export const dynamic = "force-dynamic";
 export default async function NewEmployeePage() {
   await requireRole([
     "Administrator",
-    "Human Resources",
+    "HR Officer",
   ]);
 
   const departments = (await sql`

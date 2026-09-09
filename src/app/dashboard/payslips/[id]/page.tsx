@@ -44,11 +44,7 @@ export const dynamic = "force-dynamic";
 export default async function PayslipDetailsPage({
   params,
 }: PageProps) {
-  await requireRole([
-    "Administrator",
-    "Human Resources",
-    "Accounts Officer",
-  ]);
+  await requireRole(["Administrator", "Salaries Officer"]);
 
   const { id } = await params;
 

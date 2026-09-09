@@ -1,6 +1,8 @@
 import SalaryForm from "./SalaryForm";
 
 import { requireRole } from "@/lib/auth";
+import { hasEditAccess } from "@/lib/permissions";
+import Link from "next/link";
 import { sql } from "@/lib/db";
 import { formatDate } from "@/lib/date-format";
 
@@ -32,11 +34,7 @@ type Salary = {
 export const dynamic = "force-dynamic";
 
 export default async function SalariesPage() {
-  const user = await requireRole([
-    "Administrator",
-    "Human Resources",
-    "Accounts Officer",
-  ]);
+  const user = await requireRole(["Administrator", "Salaries Officer"]);
 
   let employees: Employee[] = [];
   let salaries: Salary[] = [];
@@ -114,7 +112,17 @@ export default async function SalariesPage() {
 
   const canManage =
     user.role === "Administrator" ||
-    user.role === "Human Resources";
+    user.role === "Salaries Officer";
+
+  const editableSalaryIds = new Set(
+    (await Promise.all(
+      salaries.map(async (salary) =>
+        (await hasEditAccess(user, "Salary Management", String(salary.id)))
+          ? String(salary.id)
+          : null,
+      ),
+    )).filter(Boolean) as string[],
+  );
 
   return (
     <div className="space-y-8">
@@ -171,6 +179,7 @@ export default async function SalariesPage() {
                     Effective Period
                   </th>
                   <th className="px-6 py-4">Status</th>
+                  <th className="px-6 py-4">Action</th>
                 </tr>
               </thead>
 
@@ -226,24 +235,15 @@ export default async function SalariesPage() {
                       </p>
                     </td>
 
-                    <td className="px-6 py-4">
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs font-bold capitalize ${
-                          salary.status === "active"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-slate-200 text-slate-600"
-                        }`}
-                      >
-                        {salary.status}
-                      </span>
-                    </td>
+                    <td className="px-6 py-4"><span className={`rounded-full px-3 py-1 text-xs font-bold capitalize ${salary.status === "active" ? "bg-green-100 text-green-700" : "bg-slate-200 text-slate-600"}`}>{salary.status}</span></td>
+                    <td className="px-6 py-4">{editableSalaryIds.has(String(salary.id)) ? <Link href={`/dashboard/salaries/${salary.id}/edit`} className="rounded-lg border border-blue-200 px-3 py-2 text-sm font-black text-blue-700">Edit</Link> : user.role === "Salaries Officer" ? <Link href="/dashboard/edit-access" className="text-sm font-black text-amber-700">Request edit</Link> : null}</td>
                   </tr>
                 ))}
 
                 {salaries.length === 0 && (
                   <tr>
                     <td
-                      colSpan={7}
+                      colSpan={8}
                       className="px-6 py-12 text-center text-slate-500"
                     >
                       No employee salaries have been assigned.

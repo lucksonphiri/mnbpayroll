@@ -48,11 +48,7 @@ function formatDatabaseDate(
 export const dynamic = "force-dynamic";
 
 export default async function PayrollPage() {
-  const user = await requireRole([
-    "Administrator",
-    "Human Resources",
-    "Accounts Officer",
-  ]);
+  const user = await requireRole(["Administrator", "Salaries Officer"]);
 
   let periods: PayrollPeriod[] = [];
   let databaseAvailable = true;
@@ -136,7 +132,7 @@ export default async function PayrollPage() {
 
   const canManage = [
     "Administrator",
-    "Accounts Officer",
+    "Salaries Officer",
   ].includes(user.role);
 
   return (

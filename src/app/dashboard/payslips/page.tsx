@@ -46,11 +46,7 @@ function displayDate(value: Date | string): string {
 export const dynamic = "force-dynamic";
 
 export default async function PayslipsPage() {
-  await requireRole([
-    "Administrator",
-    "Human Resources",
-    "Accounts Officer",
-  ]);
+  await requireRole(["Administrator", "Salaries Officer"]);
 
   let approvedRuns: ApprovedRun[] = [];
   let payslips: Payslip[] = [];

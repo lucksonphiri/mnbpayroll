@@ -30,11 +30,7 @@ export const dynamic = "force-dynamic";
 export default async function EmployeesPage({
   searchParams,
 }: PageProps) {
-  const user = await requireRole([
-    "Administrator",
-    "Human Resources",
-    "Accounts Officer",
-  ]);
+  const user = await requireRole(["Administrator", "HR Officer"]);
 
   const filters = await searchParams;
 
@@ -87,7 +83,7 @@ export default async function EmployeesPage({
 
   const canCreate =
     user.role === "Administrator" ||
-    user.role === "Human Resources";
+    user.role === "HR Officer";
 
   return (
     <div>

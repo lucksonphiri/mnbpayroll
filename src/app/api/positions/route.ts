@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
   try {
     const user = await requireRole([
       "Administrator",
-      "Human Resources",
+      "HR Officer",
     ]);
 
     const body = await request.json();

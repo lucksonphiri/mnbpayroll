@@ -12,11 +12,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    await requireRole([
-      "Administrator",
-      "Human Resources",
-      "Accounts Officer",
-    ]);
+    await requireRole(["Administrator", "Salaries Officer"]);
 
     const periods = await sql`
       SELECT
@@ -86,7 +82,7 @@ export async function POST(request: NextRequest) {
   try {
     const user = await requireRole([
       "Administrator",
-      "Accounts Officer",
+      "Salaries Officer",
     ]);
 
     const body = await request.json();

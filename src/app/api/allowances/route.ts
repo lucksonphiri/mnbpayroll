@@ -35,11 +35,7 @@ function cleanDate(value: unknown): string | null {
 
 export async function GET() {
   try {
-    await requireRole([
-      "Administrator",
-      "Human Resources",
-      "Accounts Officer",
-    ]);
+    await requireRole(["Administrator", "Salaries Officer"]);
 
     const allowances = await sql`
       SELECT
@@ -106,10 +102,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await requireRole([
-      "Administrator",
-      "Human Resources",
-    ]);
+    const user = await requireRole(["Administrator", "Salaries Officer"]);
 
     const body = await request.json();
 

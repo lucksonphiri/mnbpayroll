@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { requireRole } from "@/lib/auth";
+import { hasEditAccess } from "@/lib/permissions";
+import EmployeeDocuments from "./EmployeeDocuments";
 import { sql } from "@/lib/db";
 
 type PageProps = {
@@ -21,11 +23,7 @@ function displayValue(
 export default async function EmployeeProfilePage({
   params,
 }: PageProps) {
-  const user = await requireRole([
-    "Administrator",
-    "Human Resources",
-    "Accounts Officer",
-  ]);
+  const user = await requireRole(["Administrator", "HR Officer"]);
 
   const { id } = await params;
 
@@ -58,24 +56,20 @@ export default async function EmployeeProfilePage({
 
   const employee = rows[0];
 
-  const salaryRows = await sql`
-    SELECT
-      basic_salary,
-      currency,
-      payment_frequency,
-      effective_from
-    FROM employee_salaries
-    WHERE employee_id = ${id}
-      AND status = 'active'
-    ORDER BY effective_from DESC
-    LIMIT 1
-  `;
+  const salaryRows = user.role === "Administrator"
+    ? await sql`
+        SELECT basic_salary,currency,payment_frequency,effective_from
+        FROM employee_salaries
+        WHERE employee_id = ${id}
+          AND status = 'active'
+        ORDER BY effective_from DESC
+        LIMIT 1
+      `
+    : [];
 
   const salary = salaryRows[0] ?? null;
 
-  const canEdit =
-    user.role === "Administrator" ||
-    user.role === "Human Resources";
+  const canEdit = await hasEditAccess(user, "Employees", id);
 
   return (
     <div className="space-y-8">
@@ -116,14 +110,11 @@ export default async function EmployeeProfilePage({
             Back
           </Link>
 
-          {canEdit && (
-            <Link
-              href={`/dashboard/employees/${id}/edit`}
-              className="rounded-xl bg-blue-700 px-5 py-3 font-bold text-white"
-            >
-              Edit Employee
-            </Link>
-          )}
+          {canEdit ? (
+            <Link href={`/dashboard/employees/${id}/edit`} className="rounded-xl bg-blue-700 px-5 py-3 font-bold text-white">Edit Employee</Link>
+          ) : user.role === "HR Officer" ? (
+            <Link href="/dashboard/edit-access" className="rounded-xl bg-amber-600 px-5 py-3 font-bold text-white">Request Edit Access</Link>
+          ) : null}
         </div>
       </div>
 
@@ -146,19 +137,14 @@ export default async function EmployeeProfilePage({
           </p>
         </article>
 
-        <article className="rounded-2xl bg-white p-6 shadow-sm">
-          <p className="text-sm font-semibold text-slate-500">
-            Current Basic Salary
-          </p>
-
-          <p className="mt-2 text-xl font-black">
-            {salary
-              ? `${String(salary.currency)} ${Number(
-                  salary.basic_salary,
-                ).toFixed(2)}`
-              : "Not assigned"}
-          </p>
-        </article>
+        {user.role === "Administrator" && (
+          <article className="rounded-2xl bg-white p-6 shadow-sm">
+            <p className="text-sm font-semibold text-slate-500">Current Basic Salary</p>
+            <p className="mt-2 text-xl font-black">
+              {salary ? `${String(salary.currency)} ${Number(salary.basic_salary).toFixed(2)}` : "Not assigned"}
+            </p>
+          </article>
+        )}
       </section>
 
       <section className="grid gap-6 xl:grid-cols-2">
@@ -374,6 +360,8 @@ export default async function EmployeeProfilePage({
           </dl>
         </article>
       </section>
+      <EmployeeDocuments employeeId={id} canDelete={user.role === "Administrator"} />
+
     </div>
   );
 }

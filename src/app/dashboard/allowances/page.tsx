@@ -40,11 +40,7 @@ type EmployeeAllowance = {
 export const dynamic = "force-dynamic";
 
 export default async function AllowancesPage() {
-  const user = await requireRole([
-    "Administrator",
-    "Human Resources",
-    "Accounts Officer",
-  ]);
+  const user = await requireRole(["Administrator", "Salaries Officer"]);
 
   let employees: Employee[] = [];
   let allowanceTypes: AllowanceType[] = [];
@@ -127,7 +123,7 @@ export default async function AllowancesPage() {
 
   const canManage =
     user.role === "Administrator" ||
-    user.role === "Human Resources";
+    user.role === "Salaries Officer";
 
   return (
     <div className="space-y-8">

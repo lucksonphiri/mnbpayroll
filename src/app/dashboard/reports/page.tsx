@@ -4,7 +4,7 @@ import { sql } from "@/lib/db";
 export const dynamic = "force-dynamic";
 
 export default async function ReportsPage() {
-  await requireRole(["Administrator", "Human Resources", "Accounts Officer"]);
+  await requireRole(["Administrator"]);
   const rows = await sql`
     SELECT pp.name, pr.total_employees, pr.total_basic_salary,
       pr.total_gross_salary, pr.total_deductions, pr.total_net_salary, pr.status
